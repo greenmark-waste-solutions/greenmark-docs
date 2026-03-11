@@ -41,6 +41,7 @@ Architecture Decision Records and Standard Operating Procedures for Greenmark Wa
 | 33 | Postgres SKIP LOCKED for Job Queue | Accepted |
 | 34 | claude -p Only — No Direct Anthropic API | Accepted |
 | 35 | Trust Calibration System — 4-Level Autonomy | Accepted |
+| 36 | RRF Hybrid Retrieval for Knowledge Search | Accepted |
 
 ## SOPs
 
