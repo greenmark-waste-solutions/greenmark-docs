@@ -60,9 +60,9 @@ You have something to document. What is it?
 
 ### File naming
 ```
-decisions/ADR-YYYY-NN-slug.md           ← markdown (source of truth)
-decisions/ADR-YYYY-NN-slug.pdf          ← branded PDF (stakeholder artifact)
-decisions/_generators/adr_NNN.py        ← generator script (imports from lib/greenmark_pdf.py)
+adrs/ADR-YYYY-NN-slug.md           ← markdown (source of truth)
+adrs/ADR-YYYY-NN-slug.pdf          ← branded PDF (stakeholder artifact)
+adrs/_generators/adr_NNN.py        ← generator script (imports from lib/greenmark_pdf.py)
 ```
 
 ### Required sections
@@ -198,12 +198,12 @@ AMBER_BORDER = HexColor("#D4A843")   # Amber accent box border
 7. **Fonts**: Helvetica family only (built into ReportLab)
 
 ### Generator script pattern
-- File: `decisions/_generators/adr_NNN.py` or `sops/_generators/sop_NNN.py`
+- File: `adrs/_generators/adr_NNN.py` or `sops/_generators/sop_NNN.py`
 - Import everything from `lib/greenmark_pdf.py` — never duplicate flowables
 - Content-only: define a `content(story, p)` function, call `build_doc(OUTPUT, title, content)`
 - Output PDF to parent directory (next to the markdown)
-- Run one: `python3 decisions/_generators/adr_001.py`
-- Build all: `python3 decisions/_generators/build_all.py`
+- Run one: `python3 adrs/_generators/adr_001.py`
+- Build all: `python3 adrs/_generators/build_all.py`
 - Dependency: `pip install reportlab`
 
 ## Why This Exists

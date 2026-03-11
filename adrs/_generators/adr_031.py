@@ -35,7 +35,7 @@ def content(story, p):
         [p("<b>Audience</b>", CELL), p("Future architects", CELL), p("Current operator", CELL)],
         [p("<b>Tone</b>", CELL), p("'We decided X because Y'", CELL), p("'Do X. Don't do Y.'", CELL)],
         [p("<b>Changes</b>", CELL), p("Superseded by new ADR", CELL), p("Updated in place", CELL)],
-        [p("<b>Location</b>", CELL), p("decisions/", MONO), p("sops/", MONO)],
+        [p("<b>Location</b>", CELL), p("adrs/", MONO), p("sops/", MONO)],
     ], [USABLE * 0.18, USABLE * 0.41, USABLE * 0.41]))
     story.append(hr())
 

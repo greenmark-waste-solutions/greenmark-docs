@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate all ADR PDFs from decisions/_generators/."""
+"""Regenerate all ADR PDFs from adrs/_generators/."""
 import subprocess
 from pathlib import Path
 

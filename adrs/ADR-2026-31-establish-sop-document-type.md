@@ -3,7 +3,7 @@
 - **Status**: Accepted
 - **Date**: 2026-03-11
 - **Owner**: Daniel Shanklin / Director of AI & Technology
-- **Related**: ADR-2026-05 (BLUF), ADR-2026-06 (branded PDF), `sops/` directory
+- **Related**: SOP-001 (consolidated BLUF + branded PDF requirements), `sops/` directory
 
 ## BLUF (Bottom Line Up Front)
 
@@ -59,9 +59,9 @@ This knowledge currently lives scattered across CLAUDE.md, memory files, and mee
 | **Audience** | Future architects | Current operator |
 | **Tone** | "We decided X because Y" | "Do X. Don't do Y." |
 | **Changes** | Superseded by new ADR | Updated in place |
-| **BLUF** | Required (ADR-2026-05) | Required |
-| **Branded PDF** | Required (ADR-2026-06) | Required |
-| **Location** | `decisions/` | `sops/` |
+| **BLUF** | Required (SOP-001) | Required (SOP-001) |
+| **Branded PDF** | Required (SOP-001) | Required (SOP-001) |
+| **Location** | `adrs/` | `sops/` |
 
 ### Numbering
 
