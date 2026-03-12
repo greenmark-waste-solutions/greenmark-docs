@@ -11,13 +11,17 @@ Usage:
 
 from pathlib import Path
 from datetime import datetime
+import subprocess
+import tempfile
+import json
+import atexit
 
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
 from reportlab.lib.colors import HexColor, white
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, PageBreak,
+    HRFlowable, PageBreak, Image,
 )
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
@@ -219,6 +223,112 @@ def severity_tbl(header, rows, widths):
     t = Table(data, colWidths=widths, repeatRows=1)
     t.setStyle(TableStyle(style))
     return t
+
+
+# ── Mermaid Diagrams ─────────────────────────────────────────────────
+
+# Greenmark-branded Mermaid theme config
+_MERMAID_CONFIG = {
+    "theme": "base",
+    "themeVariables": {
+        "primaryColor": "#E8F0EC",
+        "primaryBorderColor": "#2D6B4A",
+        "primaryTextColor": "#1A1A1A",
+        "secondaryColor": "#FDF8EC",
+        "secondaryBorderColor": "#D4A843",
+        "tertiaryColor": "#FDECEC",
+        "tertiaryBorderColor": "#E74C3C",
+        "lineColor": "#2D6B4A",
+        "textColor": "#1A1A1A",
+        "mainBkg": "#E8F0EC",
+        "nodeBorder": "#2D6B4A",
+        "clusterBkg": "#F5F9F7",
+        "clusterBorder": "#193B2D",
+        "titleColor": "#193B2D",
+        "edgeLabelBackground": "#FFFFFF",
+        "nodeTextColor": "#1A1A1A",
+    },
+}
+
+# Track temp files for cleanup
+_mermaid_temp_files = []
+
+
+def _cleanup_mermaid():
+    """Remove temp files created during PDF generation."""
+    for f in _mermaid_temp_files:
+        try:
+            Path(f).unlink(missing_ok=True)
+        except Exception:
+            pass
+
+
+atexit.register(_cleanup_mermaid)
+
+
+def mermaid(code, width=None):
+    """Render a Mermaid diagram to a ReportLab Image flowable.
+
+    Usage:
+        story.append(mermaid('''
+            flowchart LR
+                A[Code] --> B[Test] --> C[Deploy]
+        '''))
+
+    Args:
+        code: Mermaid diagram source code.
+        width: Image width in points. Defaults to USABLE (full page width).
+
+    Returns:
+        Image flowable, or AccentBox with error message if rendering fails.
+    """
+    if width is None:
+        width = USABLE
+
+    # Write mermaid source to temp file
+    mmd_file = tempfile.NamedTemporaryFile(suffix=".mmd", delete=False, mode="w")
+    mmd_file.write(code.strip())
+    mmd_file.close()
+    _mermaid_temp_files.append(mmd_file.name)
+
+    # Write config to temp file
+    cfg_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w")
+    json.dump(_MERMAID_CONFIG, cfg_file)
+    cfg_file.close()
+    _mermaid_temp_files.append(cfg_file.name)
+
+    # Output PNG
+    png_path = mmd_file.name.replace(".mmd", ".png")
+    _mermaid_temp_files.append(png_path)
+
+    try:
+        subprocess.run(
+            ["npx", "--yes", "@mermaid-js/mermaid-cli",
+             "-i", mmd_file.name,
+             "-o", png_path,
+             "-c", cfg_file.name,
+             "-b", "transparent",
+             "-s", "2"],
+            capture_output=True, text=True, timeout=30,
+        )
+        if not Path(png_path).exists():
+            return AccentBox(width, "Mermaid render failed — diagram omitted from PDF.",
+                             bg=AMBER_BG, border=AMBER_BORDER, text_color=AMBER)
+
+        img = Image(png_path)
+        # Scale to fit width while preserving aspect ratio
+        aspect = img.imageHeight / img.imageWidth
+        img.drawWidth = width
+        img.drawHeight = width * aspect
+        # Cap height at 5 inches to avoid page overflow
+        max_h = 5 * inch
+        if img.drawHeight > max_h:
+            img.drawHeight = max_h
+            img.drawWidth = max_h / aspect
+        return img
+    except Exception as e:
+        return AccentBox(width, f"Mermaid render error: {e}",
+                         bg=AMBER_BG, border=AMBER_BORDER, text_color=AMBER)
 
 
 # ── Helpers ──────────────────────────────────────────────────────────

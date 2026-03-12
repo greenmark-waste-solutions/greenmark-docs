@@ -194,8 +194,30 @@ AMBER_BORDER = HexColor("#D4A843")   # Amber accent box border
 3. **Decision/procedure accent box** — green border for accepted/positive, red border for rejected/warning
 4. **Branded tables** — dark green header row, alternating white/light green body rows, thin gray grid
 5. **Footer** — "Greenmark Waste Solutions | Document title | Date" left, "Page N" right
-6. **Logo path**: `infra/brand/greenmark-full-white.png` (white text on transparent, drawn at 1.35" × 0.28")
+6. **Logo path**: `brand/greenmark-full-white.png` (white text on transparent, drawn at 1.35" × 0.28")
 7. **Fonts**: Helvetica family only (built into ReportLab)
+8. **Mermaid diagrams** — `mermaid()` flowable for pipeline flows, decision trees, architecture diagrams (brand-themed, auto-scaled)
+
+### Mermaid diagrams in PDFs
+The shared library includes a `mermaid()` helper that renders Mermaid diagrams to PNG images with Greenmark brand colors and embeds them in the PDF.
+
+```python
+from lib.greenmark_pdf import *
+
+# In your content(story, p) function:
+story.append(mermaid("""
+    flowchart LR
+        A[Code] --> B[Test] --> C[Deploy]
+"""))
+```
+
+- Renders using `npx @mermaid-js/mermaid-cli` (must be available via npm)
+- Brand-themed: green nodes, dark green borders, light green backgrounds
+- Auto-scales to page width, caps height at 5 inches
+- Falls back to an amber warning box if rendering fails
+- Temp files are cleaned up automatically via `atexit`
+- Use for: pipeline flows, decision trees, dependency graphs, architecture diagrams
+- Supports all Mermaid diagram types: flowchart, sequenceDiagram, graph, etc.
 
 ### Generator script pattern
 - File: `adrs/_generators/adr_NNN.py` or `sops/_generators/sop_NNN.py`
@@ -204,7 +226,7 @@ AMBER_BORDER = HexColor("#D4A843")   # Amber accent box border
 - Output PDF to parent directory (next to the markdown)
 - Run one: `python3 adrs/_generators/adr_001.py`
 - Build all: `python3 adrs/_generators/build_all.py`
-- Dependency: `pip install reportlab`
+- Dependencies: `pip install reportlab` and `npx @mermaid-js/mermaid-cli` (for diagrams)
 
 ## Why This Exists
 
